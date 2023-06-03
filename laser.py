@@ -20,18 +20,22 @@ class Laser:
     def shoot(self, x, y):
         laser_rect = self.laser_bullet.get_rect()
         #offset from the players position so it appears that the lasers stem from the edge of the players characters
-        laser_rect.x = x + 10 
-        laser_rect.y = y + 10
+        laser_rect.x = x + 5
+        laser_rect.y = y 
         self.laser_bullets.append(laser_rect)
 
     def render(self):
         #render the list of lasers (dependent on how many are on screen and when the player presses spae)
         for laser_rect in self.laser_bullets:
             self.screen.blit(self.laser_bullet, (laser_rect.x, laser_rect.y))
+            pygame.display.update()
 
     def update(self):
-        self.laser_bullets = [laser_rect.move(7, 0) for laser_rect in self.laser_bullets]
+        for laser_rect in self.laser_bullets:
+            laser_rect.x += 7
+            pygame.display.update()
         self.laser_bullets = [laser_rect for laser_rect in self.laser_bullets if laser_rect.x < self.screen.get_width()]
+        pygame.display.update()
     #getter methods for the laser x and y positions (y will never be updated)
     def laser_x(self):
         return self.laser_bullets[0].x if self.laser_bullets else None
