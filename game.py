@@ -11,31 +11,32 @@ class Game:
         self.player_speed = 10
         pygame.mixer.init()
         pygame.mixer.music.load('a-hero-of-the-80s-126684.mp3')
-        pygame.mixer.music.set_volume(0.2)  # 80% volume
+        #setting the volume manually add functionality for user to change it
+        pygame.mixer.music.set_volume(0.2)  
         pygame.mixer.music.play()
         self.song_end = False
         self.SONG_END = pygame.USEREVENT
         pygame.mixer.music.set_endevent(self.SONG_END)
 
-        # Initialize the game objects and variables
+        #initialize the game objects and variables
         self.screen = screen
-
+        #using my own font for the game score and other text
         font_path = r"C:\Users\bengs\OneDrive\Desktop\GalactorRepublic\rishgular-font\RishgularTry-x30DO.ttf"
         font_size = 36
         self.font = pygame.font.Font(font_path, font_size)
         
         scale_factor = 0.05
 
-        # Load the spaceship image
+        #load the spaceship image
         self.spaceship_image = pygame.image.load("potential_character.png").convert_alpha()
         self.background_image = pygame.image.load("background_image.png").convert()
-        # Calculate the scaled dimensions
+        #calculate the scaled dimensions
         scaled_width = int(self.spaceship_image.get_width() * scale_factor)
         scaled_height = int(self.spaceship_image.get_height() * scale_factor)
 
-        # Scale the image using pygame.transform.scale
+        #scale the image using pygame.transform.scale
         self.spaceship_image = pygame.transform.scale(self.spaceship_image, (scaled_width, scaled_height))
-
+        #set the boundaries for the player to travel and handle in the update method
         self.min_x = 0
         self.max_x = screen.get_width() - self.spaceship_image.get_width()
         self.min_y = 0
@@ -43,7 +44,7 @@ class Game:
 
         #default positions and states for the player
         self.spaceship_x = 0
-        self.spaceship_y = 220
+        self.spaceship_y = 500
         self.moving_left = False
         self.moving_right = False
         self.moving_up = False
@@ -74,7 +75,7 @@ class Game:
         self.crashed = False
 
     def handle_events(self):
-        # Handle events such as user input
+        #handle events such as user input
         #if the key ispressed this is entered
         #this achieves either a pressing effect for when the plauer presses a key or a holdinge ffect for when the player hodls a key
         for event in pygame.event.get():
@@ -108,13 +109,13 @@ class Game:
             elif event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-
+    #draw the lasers, functionality is uncertain as the lasers are not being drawn and frankly dont need a whole other method to call another method
     def draw_lasers(self):
         for laser in self.lasers:
             laser.render()
 
     def update(self):
-        # Update the game state
+        #update the game state
         if not self._paused:
             self.handle_events()
 
@@ -137,7 +138,8 @@ class Game:
         spaceship_rect.x = self.spaceship_x
         spaceship_rect.y = self.spaceship_y
 
-        self.asteroids.update(self.player_score, self.lasers)  # Pass the lasers list to the update method of the Asteroids object
+        #pass the lasers list to the update method of the Asteroids object
+        self.asteroids.update(self.player_score, self.lasers)  
 
         for asteroid_rect, _, _, _ in self.asteroids.asteroid_rects:
             if spaceship_rect.colliderect(asteroid_rect):
@@ -155,8 +157,8 @@ class Game:
             for asteroid_rect, _, _, _ in self.asteroids.asteroid_rects:
                 if laser_rect.colliderect(asteroid_rect):
                     self.handle_collision(laser_rect, asteroid_rect)
-
-        self.draw_lasers()  # Add this line to draw the laser bullets on the screen
+        #call the "unnecessary" laser draw method to call a whole other method
+        self.draw_lasers() 
 
     def handle_collision(self, laser_rect, asteroid_rect):
         laser_index = self.lasers.index(laser_rect)
@@ -170,7 +172,7 @@ class Game:
     Ie. the player has collided with an asteroid
     """
     def reset(self):
-        # Reset all necessary variables and states to their initial values
+        #reset all necessary variables and states to their initial values
         self.player_speed = 10
         self.spaceship_x = 0
         self.spaceship_y = 220
@@ -183,22 +185,22 @@ class Game:
 
     def game_over(self):
         self.crashed = True
-        # Game over logic 
+        #game over logic 
         self.reset()  
         # Reset the game
         self.render()  
-        # Render the game objects on the screen
+        # render the game objects on the screen
         pygame.display.update()  
-        # Update the display
+        # update the display
 
-        # Wait for the player to press space to start a new game
+        #wait for the player to press space or click the start button to start a new game
         while self.crashed:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         self.crashed = False
                         return  
-                    # Return to the main file to start a new game
+                    #return to the main file to start a new game
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit()
@@ -206,18 +208,15 @@ class Game:
                 self.render()
         
     def render(self):
-        # Draw the background image
+        #draw the background image
         self.screen.blit(self.background_image, (0, 0))
-        # Render the game objects on the screen
+        #render the game objects on the screen
         self.screen.blit(self.spaceship_image, (self.spaceship_x, self.spaceship_y))
         score_text = self.font.render(f'Score: {self.player_score}', True, (0, 100, 100))
         self.screen.blit(score_text, (800, 5))
-
-        self.asteroids.render()  
-        # Add this line to render the asteroids
-
+        #render the aseroids and lasers
+        self.asteroids.render() 
         self.laser.render()
-        #this will render the bullet
 
         if self._paused:
             self.resume_button = Button(320, 295, self.resume_img, 0.2534, self.screen)
@@ -253,27 +252,26 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit()
-
-            self.render()  # Redraw the game objects
-            pygame.display.update()  # Update the display
+            #once unpaused the object must be redraw and the display must be updated to display them
+            self.render()  
+            pygame.display.update()  
 
     def run(self):
         pygame.display.set_caption("Play")
-        # Main game loop
+        # main game loop
         clock = pygame.time.Clock()  
-        # Create a clock object for controlling the frame rate
+        # create a clock object for controlling the frame rate
 
         asteroid_timer = 0
-        self.asteroid_interval = 750
+        self.asteroid_interval = 625
             
         while True:
             clock.tick(60)
-
-            self.laser_x = self.laser.laser_x() #need the x and y values for the laser to be used in this class
+            #need the x and y values for the laser to be used in this class
+            self.laser_x = self.laser.laser_x() 
             self.laser_y = self.laser.laser_y()
-
+            #continuously update the state of the game with new objects and old objects new positions
             self.update()  
-            # Update the game state
 
             current_time = pygame.time.get_ticks()
             if self.player_score >= 50: 
@@ -290,11 +288,10 @@ class Game:
                 pygame.mixer.music.play()
                 self.song_end = False
 
-            # Render the game objects on the screen
+            #render the game objects on the screen
             pygame.display.update()  
-            # Update the display
+            #update the display
 
             if self._paused:
                 self.paused()
 
-                #need to make game logic for when the player presses space
