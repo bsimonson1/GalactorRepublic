@@ -71,6 +71,9 @@ class Game:
         self.laser_x = 0
         self.laser_y = 0
         self.lasers = []
+        #set the varaible equal to 0 for now to allow the player to shoot
+        #this var will be used to moderate the players ability to shoot asteroids
+        self.last_laser_shot = 0
 
         self.crashed = False
 
@@ -92,9 +95,12 @@ class Game:
                     self._paused = not self._paused
                     #if the key is not pressed then this is entered and resets the values
                 elif event.key == pygame.K_SPACE:
-                    new_laser = Laser(self.screen)
-                    new_laser.shoot(self.spaceship_x + self.spaceship_image.get_width(), self.spaceship_y + self.spaceship_image.get_height() // 2)
-                    self.lasers.append(new_laser)
+                    current_time = pygame.time.get_ticks()
+                    if current_time - self.last_laser_shot >= 3000:  # 3000 milliseconds = 3 seconds
+                        new_laser = Laser(self.screen)
+                        new_laser.shoot(self.spaceship_x + self.spaceship_image.get_width(), self.spaceship_y + self.spaceship_image.get_height() // 2)
+                        self.lasers.append(new_laser)
+                        self.last_laser_shot = current_time
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_DOWN:
                     self.moving_down = False
@@ -109,10 +115,6 @@ class Game:
             elif event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-    #draw the lasers, functionality is uncertain as the lasers are not being drawn and frankly dont need a whole other method to call another method
-    def draw_lasers(self):
-        for laser in self.lasers:
-            laser.render()
 
     def update(self):
         #update the game state
@@ -157,8 +159,6 @@ class Game:
             for asteroid_rect, _, _, _ in self.asteroids.asteroid_rects:
                 if laser_rect.colliderect(asteroid_rect):
                     self.handle_collision(laser_rect, asteroid_rect)
-        #call the "unnecessary" laser draw method to call a whole other method
-        self.draw_lasers() 
 
     def handle_collision(self, laser_rect, asteroid_rect):
         laser_index = self.lasers.index(laser_rect)
@@ -270,6 +270,7 @@ class Game:
             #need the x and y values for the laser to be used in this class
             self.laser_x = self.laser.laser_x() 
             self.laser_y = self.laser.laser_y()
+            self.laser.render()
             #continuously update the state of the game with new objects and old objects new positions
             self.update()  
 
@@ -283,6 +284,9 @@ class Game:
 
             self.render()  
 
+            for laser in self.lasers:
+                laser.render()
+
             if self.song_end:
                 pygame.mixer.music.load('a-hero-of-the-80s-126684.mp3')
                 pygame.mixer.music.play()
@@ -294,4 +298,3 @@ class Game:
 
             if self._paused:
                 self.paused()
-
