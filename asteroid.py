@@ -7,18 +7,18 @@ class Asteroids:
 
         scale_factors = [0.22, 0.17, 0.115] 
         
-        # Load the asteroid images
+        #load the asteroid images
         self.asteroid_images = [
             pygame.image.load("large_asteroid.png").convert_alpha(),
             pygame.image.load("medium_asteroid.png").convert_alpha(),
             pygame.image.load("small_asteroid.png").convert_alpha()
         ]
 
-        # Set color key on each asteroid image surface
+        #cet color key on each asteroid image surface
         for image in self.asteroid_images:
             image.set_colorkey((0, 0, 0))
 
-        # Scale the asteroid images
+        #ccale the asteroid images
         for i in range(len(self.asteroid_images)):
             original_image = self.asteroid_images[i]
             scale_factor = scale_factors[i]
@@ -42,12 +42,13 @@ class Asteroids:
                 asteroid_rect.y -= asteroid_speed * asteroid_direction.y
     
     def render(self):
-        # Render the asteroids in place
+        #render the asteroids in place
         for asteroid_rect, asteroid_image_index, _, _ in self.asteroid_rects:
             asteroid_image = self.asteroid_images[asteroid_image_index]
             self.screen.blit(asteroid_image, asteroid_rect, special_flags=pygame.BLEND_RGBA_ADD)
     
     def split(self, asteroid_rect):
+        #get the asteroid position to pass into the create_asteroid method
         asteroid_position = asteroid_rect.center
 
         large_ast = pygame.image.load("large_asteroid.png").convert_alpha()
@@ -57,7 +58,7 @@ class Asteroids:
         large_scale_factor = 0.22
         medium_scale_factor = 0.17
         small_scale_factor = 0.115
-
+        #reload images from before, needed to compare the passed in asteroid_rect with these to determine the size
         large_width = int(large_ast.get_width() * large_scale_factor)
         large_height = int(large_ast.get_height() * large_scale_factor)
         large_scaled = pygame.transform.scale(large_ast, (large_width, large_height))
@@ -81,15 +82,16 @@ class Asteroids:
             return
 
     def create_asteroids(self, position, size, count):
-        # Create new asteroids at the given position and size
+        #create new asteroids at the given position and size
         for _ in range(count):
+            #count and size passed in from the split method. 
             if size == 'medium':
                 image_index = 1
                 speed = random.randint(5, 10)
             elif size == 'small':
                 image_index = 2
                 speed = random.randint(5, 15)
-
+        #create new asteroids from the position passed in by the splut method
             asteroid_rect = self.asteroid_images[image_index].get_rect()
             asteroid_rect.center = position
 
@@ -104,7 +106,6 @@ class Asteroids:
             if self.asteroid_rects[i][0] == asteroid_rect:
                 return i
         return None
-    
 
     def generate_asteroid(self, player_score):
         asteroid_image_index = random.randint(0, len(self.asteroid_images) - 1)

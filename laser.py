@@ -36,7 +36,7 @@ class Laser:
             pygame.display.update()
         self.laser_bullets = [laser_rect for laser_rect in self.laser_bullets if laser_rect.x < self.screen.get_width()]
         pygame.display.update()
-    #getter methods for the laser x and y positions (y will never be updated)
+    #getter methods for the laser x and y positions (y will never be updated but will be needed to calc position)
     def laser_x(self):
         return self.laser_bullets[0].x if self.laser_bullets else None
 

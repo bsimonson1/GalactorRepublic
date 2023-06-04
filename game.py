@@ -174,10 +174,10 @@ class Game:
         if laser_rect.colliderect(asteroid_rect):
             del self.lasers[laser_index]
             #need to check if asteroid size is large medium or small
-            # Call the split method with the asteroid rect
+            #call the split method with the asteroid rect to be used for asteroid checking
             self.asteroids.split(asteroid_rect)
 
-            # Remove the original asteroid rect
+            #no matter what remove the original asteroid rect the split method handles new asteroid logic and will re-add it to the asteroid list
             del self.asteroids.asteroid_rects[asteroid_index]
 
     """
