@@ -48,25 +48,37 @@ class Asteroids:
             self.screen.blit(asteroid_image, asteroid_rect, special_flags=pygame.BLEND_RGBA_ADD)
     
     def split(self, asteroid_rect):
-        # Check which asteroid rect collides with the given asteroid_rect
-        for i in range(len(self.asteroid_rects)):
-            rect, image_index, _, _ = self.asteroid_rects[i]
-            size = self.get_asteroid_size(image_index)
-            if size == 'large':
-                self.create_asteroids(rect.center, 'medium', 2)
-            elif size == 'medium':
-                self.create_asteroids(rect.center, 'small', 2)
-            elif size == 'small':
-                self.remove_asteroid(i)
-            break
+        asteroid_position = asteroid_rect.center
 
-    def get_asteroid_size(self, image_index):
-        if image_index == 0:
-            return 'large'
-        elif image_index == 1:
-            return 'medium'
-        elif image_index == 2:
-            return 'small'
+        large_ast = pygame.image.load("large_asteroid.png").convert_alpha()
+        medium_ast = pygame.image.load("medium_asteroid.png").convert_alpha()
+        small_ast = pygame.image.load("small_asteroid.png").convert_alpha()
+        #0.22, 0.17, 0.115]
+        large_scale_factor = 0.22
+        medium_scale_factor = 0.17
+        small_scale_factor = 0.115
+
+        large_width = int(large_ast.get_width() * large_scale_factor)
+        large_height = int(large_ast.get_height() * large_scale_factor)
+        large_scaled = pygame.transform.scale(large_ast, (large_width, large_height))
+        
+        medium_width = int(medium_ast.get_width() * medium_scale_factor)
+        medium_height = int(medium_ast.get_height() * medium_scale_factor)
+        medium_scaled = pygame.transform.scale(medium_ast, (medium_width, medium_height))
+
+        small_width = int(small_ast.get_width() * small_scale_factor)
+        small_height = int(small_ast.get_height() * small_scale_factor)
+        small_scaled = pygame.transform.scale(small_ast, (small_width, small_height))
+
+        #check which asteroid rect collides with the given asteroid_rect
+        if asteroid_rect.width == large_scaled.get_width() and asteroid_rect.height == large_scaled.get_height():
+            #generate the 2 medium asteroids at this position
+            self.create_asteroids(asteroid_position, 'medium', 2)
+        elif asteroid_rect.width == medium_scaled.get_width() and asteroid_rect.height == medium_scaled.get_height():
+            #generate 2 small asteroids
+            self.create_asteroids(asteroid_position, 'small', 2)
+        elif asteroid_rect.width == small_scaled.get_width() and asteroid_rect.height == small_scaled.get_height():
+            return
 
     def create_asteroids(self, position, size, count):
         # Create new asteroids at the given position and size
@@ -81,22 +93,18 @@ class Asteroids:
             asteroid_rect = self.asteroid_images[image_index].get_rect()
             asteroid_rect.center = position
 
-            angle = random.uniform(-0.3, 0.3)
+            angle = random.uniform(-0.6, 0.6)
             direction = pygame.Vector2(1, angle).normalize()
 
             self.asteroid_rects.append((asteroid_rect, image_index, speed, direction))
             self.num_of_asteroids += 1
-
-    def remove_asteroid(self, index):
-        # Remove the asteroid at the given index from the asteroid_rects list
-        self.asteroid_rects.pop(index)
-        self.num_of_asteroids -= 1
 
     def get_asteroid_rect(self, asteroid_rect):
         for i in range(len(self.asteroid_rects)):
             if self.asteroid_rects[i][0] == asteroid_rect:
                 return i
         return None
+    
 
     def generate_asteroid(self, player_score):
         asteroid_image_index = random.randint(0, len(self.asteroid_images) - 1)
@@ -108,7 +116,7 @@ class Asteroids:
         else:
             asteroid_speed = random.randint(5, 10)
 
-        angle = random.uniform(-0.5, 0.5)
+        angle = random.uniform(-0.3, 0.3)
         asteroid_direction = pygame.Vector2(1, angle).normalize()
 
         self.asteroid_rects.append((asteroid_rect, asteroid_image_index, asteroid_speed, asteroid_direction))

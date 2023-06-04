@@ -101,7 +101,12 @@ class Game:
                         pygame.mixer.music.set_volume(0.2)
                 elif event.key == pygame.K_SPACE:
                     current_time = pygame.time.get_ticks()
-                    if current_time - self.last_laser_shot >= 3000:  # 3000 milliseconds = 3 seconds
+                    if current_time - self.last_laser_shot >= 3000 and self.player_score <= 50:  # 3000 milliseconds = 3 seconds
+                        new_laser = Laser(self.screen)
+                        new_laser.shoot(self.spaceship_x + self.spaceship_image.get_width(), self.spaceship_y + self.spaceship_image.get_height() // 2)
+                        self.lasers.append(new_laser)
+                        self.last_laser_shot = current_time
+                    elif current_time - self.last_laser_shot >= 750 and self.player_score >= 50:  #750 = .750 seconds
                         new_laser = Laser(self.screen)
                         new_laser.shoot(self.spaceship_x + self.spaceship_image.get_width(), self.spaceship_y + self.spaceship_image.get_height() // 2)
                         self.lasers.append(new_laser)
@@ -168,6 +173,11 @@ class Game:
         asteroid_index = self.asteroids.get_asteroid_rect(asteroid_rect)
         if laser_rect.colliderect(asteroid_rect):
             del self.lasers[laser_index]
+            #need to check if asteroid size is large medium or small
+            # Call the split method with the asteroid rect
+            self.asteroids.split(asteroid_rect)
+
+            # Remove the original asteroid rect
             del self.asteroids.asteroid_rects[asteroid_index]
 
     """
@@ -178,7 +188,7 @@ class Game:
         #reset all necessary variables and states to their initial values
         self.player_speed = 10
         self.spaceship_x = 0
-        self.spaceship_y = 220
+        self.spaceship_y = 500
         self.moving_left = False
         self.moving_right = False
         self.moving_up = False
@@ -273,7 +283,6 @@ class Game:
             #need the x and y values for the laser to be used in this class
             self.laser_x = self.laser.laser_x() 
             self.laser_y = self.laser.laser_y()
-            self.laser.render()
             #continuously update the state of the game with new objects and old objects new positions
             self.update()  
 
