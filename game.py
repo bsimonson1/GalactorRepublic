@@ -82,13 +82,13 @@ class Game:
         #this achieves either a pressing effect for when the plauer presses a key or a holdinge ffect for when the player hodls a key
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_DOWN:
+                if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     self.moving_down = True
-                elif event.key == pygame.K_UP:
+                elif event.key == pygame.K_UP or event.key == pygame.K_w:
                     self.moving_up = True
-                elif event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     self.moving_right = True
-                elif event.key == pygame.K_LEFT:
+                elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     self.moving_left = True
                 elif event.key == pygame.K_ESCAPE:
                     self._paused = not self._paused
@@ -112,14 +112,27 @@ class Game:
                         self.lasers.append(new_laser)
                         self.last_laser_shot = current_time
             elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_DOWN:
+                if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     self.moving_down = False
-                elif event.key == pygame.K_UP:
+                elif event.key == pygame.K_UP or event.key == pygame.K_w:
                     self.moving_up = False
-                elif event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     self.moving_right = False
-                elif event.key == pygame.K_LEFT:
+                elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     self.moving_left = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    current_time = pygame.time.get_ticks()
+                    if current_time - self.last_laser_shot >= 3000 and self.player_score <= 50:  # 3000 milliseconds = 3 seconds
+                        new_laser = Laser(self.screen)
+                        new_laser.shoot(self.spaceship_x + self.spaceship_image.get_width(), self.spaceship_y + self.spaceship_image.get_height() // 2)
+                        self.lasers.append(new_laser)
+                        self.last_laser_shot = current_time
+                    elif current_time - self.last_laser_shot >= 750 and self.player_score >= 50:  #750 = .750 seconds
+                        new_laser = Laser(self.screen)
+                        new_laser.shoot(self.spaceship_x + self.spaceship_image.get_width(), self.spaceship_y + self.spaceship_image.get_height() // 2)
+                        self.lasers.append(new_laser)
+                        self.last_laser_shot = current_time
             elif event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
