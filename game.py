@@ -282,15 +282,17 @@ class Game:
             self.render()  
             pygame.display.update()  
 
-    def run(self):
+    def run(self, difficulty):
         pygame.display.set_caption("Play")
         # main game loop
         clock = pygame.time.Clock()  
         # create a clock object for controlling the frame rate
-
-        asteroid_timer = 0
-        self.asteroid_interval = 625
-            
+        if difficulty == "normal":
+            asteroid_timer = 0
+            self.asteroid_interval = 625
+        elif difficulty == "yasmin":
+            asteroid_timer = 0
+            self.asteroid_interval = 2000
         while True:
             clock.tick(60)
             #need the x and y values for the laser to be used in this class
@@ -300,9 +302,10 @@ class Game:
             self.update()  
 
             current_time = pygame.time.get_ticks()
-            if self.player_score >= 50: 
+            if self.player_score >= 50 and difficulty == "normal": 
                 self.asteroid_interval = 420
-                self.player_speed = 15
+            elif self.player_score >= 50 and difficulty == "yasmin": 
+                self.asteroid_interval = 1500
             if current_time - asteroid_timer >= self.asteroid_interval:
                 self.asteroids.generate_asteroid(self.player_score)
                 asteroid_timer = current_time

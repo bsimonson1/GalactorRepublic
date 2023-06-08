@@ -113,7 +113,7 @@ class Asteroids:
         asteroid_rect.x = 1000
         asteroid_rect.y = random.randint(1, 800)
         if player_score >= 50:
-            asteroid_speed = random.randint(5, 15)
+            asteroid_speed = random.randint(8, 13)
         else:
             asteroid_speed = random.randint(5, 10)
 
