@@ -106,7 +106,7 @@ class Game:
                         new_laser.shoot(self.spaceship_x + self.spaceship_image.get_width(), self.spaceship_y + self.spaceship_image.get_height() // 2)
                         self.lasers.append(new_laser)
                         self.last_laser_shot = current_time
-                    elif current_time - self.last_laser_shot >= 750 and self.player_score >= 50:  #750 = .750 seconds
+                    elif current_time - self.last_laser_shot >= 300 and self.player_score >= 50:  #750 = .750 seconds
                         new_laser = Laser(self.screen)
                         new_laser.shoot(self.spaceship_x + self.spaceship_image.get_width(), self.spaceship_y + self.spaceship_image.get_height() // 2)
                         self.lasers.append(new_laser)
@@ -128,7 +128,7 @@ class Game:
                         new_laser.shoot(self.spaceship_x + self.spaceship_image.get_width(), self.spaceship_y + self.spaceship_image.get_height() // 2)
                         self.lasers.append(new_laser)
                         self.last_laser_shot = current_time
-                    elif current_time - self.last_laser_shot >= 750 and self.player_score >= 50:  #750 = .750 seconds
+                    elif current_time - self.last_laser_shot >= 300 and self.player_score >= 50:  #750 = .750 seconds
                         new_laser = Laser(self.screen)
                         new_laser.shoot(self.spaceship_x + self.spaceship_image.get_width(), self.spaceship_y + self.spaceship_image.get_height() // 2)
                         self.lasers.append(new_laser)
