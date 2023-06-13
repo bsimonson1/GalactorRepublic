@@ -13,10 +13,7 @@ class Game:
         pygame.mixer.music.load('a-hero-of-the-80s-126684.mp3')
         #setting the volume manually add functionality for user to change it
         pygame.mixer.music.set_volume(0.2)  
-        pygame.mixer.music.play()
-        self.song_end = False
-        self.SONG_END = pygame.USEREVENT
-        pygame.mixer.music.set_endevent(self.SONG_END)
+        pygame.mixer.music.play(-1)
 
         #initialize the game objects and variables
         self.screen = screen
@@ -77,41 +74,65 @@ class Game:
 
         self.crashed = False
 
+        self.toggle_mute = False
+
     def handle_events(self):
         #handle events such as user input
         #if the key ispressed this is entered
         #this achieves either a pressing effect for when the plauer presses a key or a holdinge ffect for when the player hodls a key
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_DOWN:
+                if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     self.moving_down = True
-                elif event.key == pygame.K_UP:
+                elif event.key == pygame.K_UP or event.key == pygame.K_w:
                     self.moving_up = True
-                elif event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     self.moving_right = True
-                elif event.key == pygame.K_LEFT:
+                elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     self.moving_left = True
                 elif event.key == pygame.K_ESCAPE:
                     self._paused = not self._paused
                     #if the key is not pressed then this is entered and resets the values
+                elif event.key == pygame.K_m:
+                    self.toggle_mute = not self.toggle_mute
+                    if self.toggle_mute:
+                        pygame.mixer.music.set_volume(0.0)
+                    else:
+                        pygame.mixer.music.set_volume(0.2)
                 elif event.key == pygame.K_SPACE:
                     current_time = pygame.time.get_ticks()
-                    if current_time - self.last_laser_shot >= 3000:  # 3000 milliseconds = 3 seconds
+                    if current_time - self.last_laser_shot >= 3000 and self.player_score <= 50:  # 3000 milliseconds = 3 seconds
+                        new_laser = Laser(self.screen)
+                        new_laser.shoot(self.spaceship_x + self.spaceship_image.get_width(), self.spaceship_y + self.spaceship_image.get_height() // 2)
+                        self.lasers.append(new_laser)
+                        self.last_laser_shot = current_time
+                    elif current_time - self.last_laser_shot >= 300 and self.player_score >= 50:  #750 = .750 seconds
                         new_laser = Laser(self.screen)
                         new_laser.shoot(self.spaceship_x + self.spaceship_image.get_width(), self.spaceship_y + self.spaceship_image.get_height() // 2)
                         self.lasers.append(new_laser)
                         self.last_laser_shot = current_time
             elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_DOWN:
+                if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     self.moving_down = False
-                elif event.key == pygame.K_UP:
+                elif event.key == pygame.K_UP or event.key == pygame.K_w:
                     self.moving_up = False
-                elif event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     self.moving_right = False
-                elif event.key == pygame.K_LEFT:
+                elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     self.moving_left = False
-            elif event.type == self.SONG_END:
-                    self.song_end = True
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    current_time = pygame.time.get_ticks()
+                    if current_time - self.last_laser_shot >= 3000 and self.player_score <= 50:  # 3000 milliseconds = 3 seconds
+                        new_laser = Laser(self.screen)
+                        new_laser.shoot(self.spaceship_x + self.spaceship_image.get_width(), self.spaceship_y + self.spaceship_image.get_height() // 2)
+                        self.lasers.append(new_laser)
+                        self.last_laser_shot = current_time
+                    elif current_time - self.last_laser_shot >= 300 and self.player_score >= 50:  #750 = .750 seconds
+                        new_laser = Laser(self.screen)
+                        new_laser.shoot(self.spaceship_x + self.spaceship_image.get_width(), self.spaceship_y + self.spaceship_image.get_height() // 2)
+                        self.lasers.append(new_laser)
+                        self.last_laser_shot = current_time
             elif event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
@@ -165,6 +186,11 @@ class Game:
         asteroid_index = self.asteroids.get_asteroid_rect(asteroid_rect)
         if laser_rect.colliderect(asteroid_rect):
             del self.lasers[laser_index]
+            #need to check if asteroid size is large medium or small
+            #call the split method with the asteroid rect to be used for asteroid checking
+            self.asteroids.split(asteroid_rect)
+
+            #no matter what remove the original asteroid rect the split method handles new asteroid logic and will re-add it to the asteroid list
             del self.asteroids.asteroid_rects[asteroid_index]
 
     """
@@ -175,7 +201,7 @@ class Game:
         #reset all necessary variables and states to their initial values
         self.player_speed = 10
         self.spaceship_x = 0
-        self.spaceship_y = 220
+        self.spaceship_y = 500
         self.moving_left = False
         self.moving_right = False
         self.moving_up = False
@@ -184,6 +210,7 @@ class Game:
         self.asteroids = Asteroids(self.screen)
 
     def game_over(self):
+        pygame.mixer.music.stop()
         self.crashed = True
         #game over logic 
         self.reset()  
@@ -224,6 +251,7 @@ class Game:
             self.paused_button = Button(335, 75, self.paused_img, 0.25, self.screen)
             self.paused_button.draw()
             if self.resume_button.draw():
+                pygame.mixer.music.play(-1)
                 self._paused = not self._paused
                 return
             if self.quit_button.draw():
@@ -234,6 +262,10 @@ class Game:
             self.retry = Button(335, 215, self.retry_img, 0.25, self.screen)
             self.quit_button_crashed = Button(335, 415, self.quit_img, 0.255, self.screen)
             if self.retry.draw():
+                pygame.mixer.music.load('a-hero-of-the-80s-126684.mp3')
+                #setting the volume manually add functionality for user to change it
+                pygame.mixer.music.set_volume(0.2)  
+                pygame.mixer.music.play(-1)
                 self.crashed = False
                 return
             if self.quit_button_crashed.draw():
@@ -256,28 +288,30 @@ class Game:
             self.render()  
             pygame.display.update()  
 
-    def run(self):
+    def run(self, difficulty):
         pygame.display.set_caption("Play")
         # main game loop
         clock = pygame.time.Clock()  
         # create a clock object for controlling the frame rate
-
-        asteroid_timer = 0
-        self.asteroid_interval = 625
-            
+        if difficulty == "normal":
+            asteroid_timer = 0
+            self.asteroid_interval = 625
+        elif difficulty == "yasmin":
+            asteroid_timer = 0
+            self.asteroid_interval = 2000
         while True:
             clock.tick(60)
             #need the x and y values for the laser to be used in this class
             self.laser_x = self.laser.laser_x() 
             self.laser_y = self.laser.laser_y()
-            self.laser.render()
             #continuously update the state of the game with new objects and old objects new positions
             self.update()  
 
             current_time = pygame.time.get_ticks()
-            if self.player_score >= 50: 
+            if self.player_score >= 50 and difficulty == "normal": 
                 self.asteroid_interval = 420
-                self.player_speed = 15
+            elif self.player_score >= 50 and difficulty == "yasmin": 
+                self.asteroid_interval = 1500
             if current_time - asteroid_timer >= self.asteroid_interval:
                 self.asteroids.generate_asteroid(self.player_score)
                 asteroid_timer = current_time
@@ -286,11 +320,6 @@ class Game:
 
             for laser in self.lasers:
                 laser.render()
-
-            if self.song_end:
-                pygame.mixer.music.load('a-hero-of-the-80s-126684.mp3')
-                pygame.mixer.music.play()
-                self.song_end = False
 
             #render the game objects on the screen
             pygame.display.update()  

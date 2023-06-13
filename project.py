@@ -19,18 +19,43 @@ def main():
 
     play_img = pygame.image.load("play.png").convert_alpha()
     quit_img = pygame.image.load("quit.png").convert_alpha()
+    instructions_img = pygame.image.load("instructions.png").convert_alpha()
+    normal_difficulty_img = pygame.image.load("normal.png").convert_alpha()
+    yasmin_difficulty_img = pygame.image.load("yasmin.png").convert_alpha()
+    difficulty_img = pygame.image.load("difficulty_select.png").convert_alpha()
 
     running = True
     while running:
         #default screen (black) instruction the user how to start the game
-        screen.fill((0, 0, 0))  # Clear the screen with a black color
-        #335, 215, self.retry_img, 0.25, self.screen
+        #clear the screen with a black color
+        screen.fill((0, 0, 0)) 
         play_button = Button(305, 115, play_img, 0.25, screen)
+        instructions_button = Button(335, 320, instructions_img, 0.25, screen)
         quit_button = Button(335, 515, quit_img, 0.25, screen)
+        normal_button = Button(100, 300, normal_difficulty_img, 0.25, screen)
+        yasmin_button = Button(500, 300, yasmin_difficulty_img, 0.25, screen)
+        difficulty_button = Button(285, 100, difficulty_img, 0.25, screen)
 
         if play_button.draw():
-            game = Game(screen)  # Create an instance of the Game class
-            game.run()  # Start the game when space is pressed
+            screen.fill((0, 0, 0))
+            while running:
+                difficulty_button.draw()
+                if normal_button.draw():
+                    #create an object of the game class
+                    game = Game(screen)  
+                    #call the method that starts the infinite game loop
+                    game.run("normal")  
+                elif yasmin_button.draw():
+                    #create an object of the game class
+                    game = Game(screen)  
+                    #call the method that starts the infinite game loop
+                    game.run("yasmin")  
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        running = False
+                pygame.display.update()
+        if instructions_button.draw():
+            instructions_button.draw_menu()
         if quit_button.draw():
             running = False
 
@@ -38,12 +63,6 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-
-        # Display the main menu as well as instructions to start the game
-        # draw_text("Main Menu", font, text_col, 265, 180)
-        # draw_text("Press SPACE to start", font, text_col, 160, 225)
-
-        
         pygame.display.update()
 
     pygame.quit()
